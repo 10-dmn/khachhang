@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dự Đoán Khách Hàng Quay Lại Mua Sắm - DMC AI System</title>
+    <!-- Google Font: Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-page: #F8FAFC;
+            --bg-card: #FFFFFF;
+            --border-color: #E2E8F0;
+            --border-hover: #CBD5E1;
+            
+            --text-heading: #0F172A;
+            --text-body: #475569;
+            --text-muted: #64748B;
+            --text-light: #94A3B8;
+
+            --primary: #4338CA;
+            --primary-light: #EEF2FF;
+            --emerald: #059669;
+            --emerald-light: #ECFDF5;
+            --crimson: #DC2626;
+            --crimson-light: #FEF2F2;
+            --amber: #D97706;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-body);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Top Header */
+        .navbar {
+            background: #FFFFFF;
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.2rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text-heading);
+            letter-spacing: -0.3px;
+        }
+
+        .brand-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        .badge-list {
+            display: flex;
+            gap: 10px;
+        }
+
+        .badge {
+            background: var(--bg-page);
+            border: 1px solid var(--border-color);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-body);
+        }
+
+        .badge-primary {
+            background: var(--primary-light);
+            color: var(--primary);
+            border-color: rgba(67, 56, 202, 0.2);
+        }
+
+        /* Container Layout */
+        .container {
+            max-width: 1360px;
+            margin: 0 auto;
+            padding: 2.5rem 2rem;
+            width: 100%;
+            flex: 1;
+        }
+
+        /* Navigation Tabs */
+        .tab-menu {
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.9rem 1.6rem;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-heading);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* Minimal White Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            border-color: var(--border-hover);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Typography & Headings */
+        h2.section-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text-heading);
+            margin-bottom: 1.2rem;
+            letter-spacing: -0.3px;
+        }
+
+        /* Preset Examples Bar */
+        .preset-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .preset-btn {
+            background: #F1F5F9;
+            border: 1px solid var(--border-color);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-body);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .preset-btn:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+            border-color: rgba(67, 56, 202, 0.3);
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-heading);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-label .val-highlight {
+            color: var(--primary);
+            font-weight: 800;
+        }
+
+        .form-control, .form-select {
+            width: 100%;
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            color: var(--text-heading);
+            font-size: 0.92rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        /* Range Slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            background: #E2E8F0;
+            height: 6px;
+            border-radius: 3px;
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            transition: transform 0.15s ease;
+        }
+
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.25);
+        }
+
+        /* Pill Radio Buttons */
+        .pill-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .pill-btn {
+            flex: 1;
+            text-align: center;
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-body);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .pill-btn:hover {
+            border-color: var(--primary);
+        }
+
+        .pill-btn.active {
+            background: var(--primary);
+            color: #FFFFFF;
+            border-color: var(--primary);
+        }
+
+        /* Primary Action Button */
+        .btn-primary {
+            background: var(--primary);
+            color: #FFFFFF;
+            border: none;
+            border-radius: 10px;
+            padding: 0.95rem 2rem;
+            font-size: 0.95rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary:hover {
+            background: #3730A3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 56, 202, 0.25);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        /* Code Attribute Pill Badges */
+        .attr-pill {
+            background: #F1F5F9;
+            border: 1px solid #E2E8F0;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-family: monospace, sans-serif;
+            font-size: 0.82rem;
+            color: #334155;
+            display: inline-block;
+            margin: 3px 2px;
+        }
+
+        .attr-pill b {
+            color: #0F172A;
+        }
+
+        /* Result Sections Matching User Image */
+        .result-section {
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 1.3rem;
+            margin-top: 0.9rem;
+            width: 100%;
+            text-align: left;
+        }
+
+        .result-section-title {
+            font-size: 0.92rem;
+            font-weight: 800;
+            color: var(--text-heading);
+            margin-bottom: 0.7rem;
+        }
+
+        /* HIGH-IMPACT HERO PERCENTAGE BANNER */
+        .hero-pct-banner {
+            border-radius: 16px;
+            padding: 1.8rem;
+            text-align: center;
+            margin-bottom: 1.2rem;
+            border: 2px solid transparent;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-pct-banner.return {
+            background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+            border-color: #10B981;
+            color: #047857;
+            box-shadow: 0 10px 30px -10px rgba(16, 185, 129, 0.25);
+        }
+
+        .hero-pct-banner.churn {
+            background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%);
+            border-color: #EF4444;
+            color: #B91C1C;
+            box-shadow: 0 10px 30px -10px rgba(239, 68, 68, 0.25);
+        }
+
+        .hero-pct-number {
+            font-size: 3.2rem;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -1px;
+            margin-bottom: 0.4rem;
+        }
+
+        .hero-pct-subtitle {
+            font-size: 1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .hero-pct-breakdown {
+            font-size: 0.88rem;
+            margin-top: 0.5rem;
+            opacity: 0.85;
+            font-weight: 600;
+        }
+
+        /* POP-IN TRANSITION ANIMATION */
+        .animate-pop-in {
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.94) translateY(12px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* SCANNING LOADING SHIMMER */
+        .scanning-loader {
+            display: none;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #EEF2FF 0%, #4338CA 50%, #EEF2FF 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1s infinite linear;
+            border-radius: 2px;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Table Styling */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: #F1F5F9;
+            color: var(--text-muted);
+            padding: 0.95rem 1.1rem;
+            font-weight: 700;
+            border-bottom: 1px solid var(--border-color);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 0.9rem 1.1rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-heading);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: #F8FAFC;
+        }
+
+        .tag {
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .tag-return {
+            background: var(--emerald-light);
+            color: var(--emerald);
+        }
+
+        .tag-churn {
+            background: var(--crimson-light);
+            color: var(--crimson);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header class="navbar">
+        <div>
+            <div class="brand-title">DMC Customer Repurchase AI</div>
+            <div class="brand-subtitle">Hệ Thống Dự Đoán Khách Hàng Quay Lại Mua Sắm — Binary Classification</div>
+        </div>
+        <div class="badge-list">
+            <span class="badge badge-primary" id="header-best-model">Gradient Boosting 94.23% Accuracy</span>
+            <span class="badge">Supervised Binary ML · Fine-tuned 5 Rounds</span>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="container">
+
+        <!-- Tab Navigation -->
+        <nav class="tab-menu">
+            <button class="tab-btn active" onclick="switchTab(event,'predictor')">Dự Đoán Khách Hàng Real-Time</button>
+            <button class="tab-btn" onclick="switchTab(event,'benchmark')">Đánh Giá 4 Mô Hình ML</button>
+            <button class="tab-btn" onclick="switchTab(event,'batch')">Dự Đoán Hàng Loạt (CSV)</button>
+            <button class="tab-btn" onclick="switchTab(event,'overview')">Tổng Quan Dữ Liệu</button>
+        </nav>
+
+        <!-- TAB 1: DỰ ĐOÁN KHÁCH HÀNG REAL-TIME (DEFAULT TAB) -->
+        <div id="tab-predictor" class="tab-pane active">
+            
+            <!-- Preset Buttons Bar -->
+            <div class="preset-bar">
+                <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); align-self: center;">Chọn Ví dụ Mẫu:</span>
+                <button class="preset-btn" onclick="loadPreset(1)">Ví dụ 1: Khách hàng Trung thành VIP</button>
+                <button class="preset-btn" onclick="loadPreset(2)">Ví dụ 2: Khách hàng Rời bỏ (Churned Customer)</button>
+                <button class="preset-btn" onclick="loadPreset(3)">Ví dụ 3: Khách hàng Săn Giảm giá (Voucher Hunter)</button>
+            </div>
+
+            <div class="grid-2">
+                
+                <!-- Left Input Controls -->
+                <div class="card">
+                    <h2 class="section-title">Nhập Thông Tin Thuộc Tính Khách Hàng</h2>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 1.2rem;">
+                        <div class="form-group">
+                            <div class="form-label">Thuật toán mô hình:</div>
+                            <select id="sim-model" class="form-select">
+                                <option value="Gradient Boosting" selected>Gradient Boosting ★ Champion (Acc 94.23%)</option>
+                                <option value="Random Forest">Random Forest (Acc 91.56%)</option>
+                                <option value="Decision Tree">Decision Tree (Acc 74.96%)</option>
+                                <option value="Logistic Regression">Logistic Regression (Acc 68.47%)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <div class="form-label">Ngưỡng quyết định: <span class="val-highlight" id="val-thresh">0.50</span></div>
+                            <input type="range" id="sim-threshold" min="0.10" max="0.90" step="0.05" value="0.50" oninput="updateThresh(this.value)">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 1.2rem;">
+                        <div class="form-group">
+                            <div class="form-label">Tuổi (age): <span class="val-highlight" id="val-age">32</span> tuổi</div>
+                            <input type="range" id="sim-age" min="18" max="70" value="32" oninput="document.getElementById('val-age').innerText=this.value">
+                        </div>
+                        <div class="form-group">
+                            <div class="form-label">Giới tính (gender):</div>
+                            <div class="pill-group">
+                                <div class="pill-btn active" id="g-nam" onclick="setGender('Nam')">Nam</div>
+                                <div class="pill-btn" id="g-nu" onclick="setGender('Nữ')">Nữ</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 1.2rem;">
+                        <div class="form-group">
+                            <div class="form-label">Tổng đơn đã mua (total_purchases): <span class="val-highlight" id="val-purchases">6</span> đơn</div>
+                            <input type="range" id="sim-purchases" min="1" max="50" value="6" oninput="document.getElementById('val-purchases').innerText=this.value">
+                        </div>
+                        <div class="form-group">
+                            <div class="form-label">AOV chi tiêu (avg_order_value): <span class="val-highlight" id="val-aov">650,000</span> VNĐ</div>
+                            <input type="range" id="sim-aov" min="150000" max="4500000" step="50000" value="650000" oninput="document.getElementById('val-aov').innerText=parseInt(this.value).toLocaleString()">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 1.2rem;">
+                        <div class="form-group">
+                            <div class="form-label">Recency (days_since_last_purchase): <span class="val-highlight" id="val-recency">14</span> ngày</div>
+                            <input type="range" id="sim-recency" min="1" max="180" value="14" oninput="document.getElementById('val-recency').innerText=this.value">
+                        </div>
+                        <div class="form-group">
+                            <div class="form-label">Hạng thành viên (membership_level):</div>
+                            <div class="pill-group">
+                                <div class="pill-btn" id="m-dong" onclick="setMembership('Đồng')">Đồng</div>
+                                <div class="pill-btn active" id="m-bac" onclick="setMembership('Bạc')">Bạc</div>
+                                <div class="pill-btn" id="m-vang" onclick="setMembership('Vàng')">Vàng</div>
+                                <div class="pill-btn" id="m-kc" onclick="setMembership('Kim Cương')">Kim Cương</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 1.5rem;">
+                        <div class="form-group">
+                            <div class="form-label">Đã từng dùng Voucher (used_voucher):</div>
+                            <div class="pill-group">
+                                <div class="pill-btn active" id="v-1" onclick="setVoucher(1)">True (1)</div>
+                                <div class="pill-btn" id="v-0" onclick="setVoucher(0)">False (0)</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="form-label">Điểm hài lòng (satisfaction_score): <span class="val-highlight" id="val-sat">4/5 ⭐</span></div>
+                            <input type="range" id="sim-sat" min="1" max="5" value="4" oninput="document.getElementById('val-sat').innerText=this.value + '/5 ⭐'">
+                        </div>
+                    </div>
+
+                    <button class="btn-primary" id="btn-submit-predict" onclick="runPredict()">Chạy Dự Đoán Khách Hàng</button>
+                </div>
+
+                <!-- Right Prediction Output -->
+                <div class="card" style="display: flex; flex-direction: column; justify-content: top;">
+                    <h2 class="section-title">Kết Quả Phân Tích & Dự Đoán Khách Hàng</h2>
+
+                    <!-- Scanning Loading Bar -->
+                    <div id="scanning-bar" class="scanning-loader"></div>
+
+                    <!-- Initial Placeholder State (Khi chưa bấm nút) -->
+                    <div id="output-placeholder" style="text-align: center; padding: 4rem 1.5rem; color: var(--text-muted);">
+                        <div style="font-size: 1.1rem; font-weight: 700; color: var(--text-heading); margin-bottom: 0.5rem;">Chưa có dữ liệu dự đoán</div>
+                        <p style="font-size: 0.88rem; max-width: 380px; margin: 0 auto; line-height: 1.6;">
+                            Vui lòng chọn thông tin thuộc tính hoặc chọn nút <b>Ví dụ Mẫu</b> ở trên, sau đó nhấn nút <b>"Chạy Dự Đoán Khách Hàng"</b> để xem kết quả phân tích.
+                        </p>
+                    </div>
+
+                    <!-- Structured Output Container (Khớp 100% với ảnh đính kèm + NỔI BẬT CON SỐ %) -->
+                    <div id="output-results" style="display: none; width: 100%;">
+
+                        <!-- HERO PERCENTAGE BANNER NỔI BẬT -->
+                        <div id="hero-banner" class="hero-pct-banner return">
+                            <div class="hero-pct-number" id="hero-num">85.4%</div>
+                            <div class="hero-pct-subtitle" id="hero-title">KHÁCH HÀNG SẼ QUAY LẠI MUA SẮM</div>
+                            <div class="hero-pct-breakdown" id="hero-breakdown">Xác suất quay lại: 85.4% | Nguy cơ rời bỏ Churn: 14.6%</div>
+                        </div>
+
+                        <!-- 1. Bộ thuộc tính kết hợp -->
+                        <div class="result-section">
+                            <div class="result-section-title">• Bộ thuộc tính kết hợp:</div>
+                            <div style="line-height: 2;">
+                                <div>
+                                    <span class="attr-pill">age : <b id="out-age">32</b></span>
+                                    <span class="attr-pill">gender : <b id="out-gender">Nam</b></span>
+                                </div>
+                                <div>
+                                    <span class="attr-pill">total_purchases : <b id="out-purchases">6 lần</b></span>
+                                    <span class="attr-pill">avg_order_value : <b id="out-aov">650.000 VNĐ</b></span>
+                                </div>
+                                <div>
+                                    <span class="attr-pill">days_since_last_purchase : <b id="out-recency">14 ngày</b></span>
+                                    <span class="attr-pill">membership_level : <b id="out-membership">Bạc</b></span>
+                                </div>
+                                <div>
+                                    <span class="attr-pill">used_voucher : <b id="out-voucher">True</b></span>
+                                    <span class="attr-pill">satisfaction_score : <b id="out-sat">4/5</b></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. Phân tích kết hợp -->
+                        <div class="result-section">
+                            <div class="result-section-title">• Phân tích kết hợp:</div>
+                            <p style="font-size: 0.9rem; color: var(--text-body); line-height: 1.6;" id="out-synthesis">
+                                Tần suất mua khá ổn (6 lần), mới mua dưới 30 ngày (14 ngày), điểm hài lòng tốt (4/5).
+                            </p>
+                        </div>
+
+                        <!-- 3. Kết quả dự đoán -->
+                        <div class="result-section">
+                            <div class="result-section-title">• Kết quả dự đoán:</div>
+                            <div style="font-size: 0.92rem; font-weight: 700; color: var(--text-heading); padding: 0.5rem 0;" id="out-result-string">
+                                Nhãn 1 (Quay lại) — Xác suất: 85.4% (nguy cơ rời bỏ 14.6%).
+                            </div>
+                        </div>
+
+                        <!-- 4. Gợi ý tiếp thị -->
+                        <div class="result-section">
+                            <div class="result-section-title">• Gợi ý hành động doanh nghiệp:</div>
+                            <p style="font-size: 0.88rem; color: var(--text-body); line-height: 1.6;" id="out-advice">
+                                Khách hàng trung thành. Gửi mã ưu đãi Tri ân VIP 15% cho đơn hàng tiếp theo.
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- TAB 2: TỔNG QUAN & DỮ LIỆU KAGGLE -->
+        <div id="tab-overview" class="tab-pane">
+            <div class="grid-4">
+                <div class="card">
+                    <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Tổng Khách Hàng Kaggle</div>
+                    <div style="font-size: 2rem; font-weight: 800; color: var(--text-heading); margin-top: 4px;" id="st-total">5,630</div>
+                </div>
+                <div class="card">
+                    <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Tỷ Lệ Quay Lại (30 Ngày)</div>
+                    <div style="font-size: 2rem; font-weight: 800; color: var(--emerald); margin-top: 4px;" id="st-return">83.2%</div>
+                </div>
+                <div class="card">
+                    <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Tỷ Lệ Nguy Cơ Churn</div>
+                    <div style="font-size: 2rem; font-weight: 800; color: var(--crimson); margin-top: 4px;" id="st-churn">16.8%</div>
+                </div>
+                <div class="card">
+                    <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">AOV Chi Tiêu Trung Bình</div>
+                    <div style="font-size: 2rem; font-weight: 800; color: var(--primary); margin-top: 4px;" id="st-aov">532,000 đ</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;">
+                    <h2 class="section-title" style="margin-bottom: 0;">Danh Sách Khách Hàng Thực Tế</h2>
+                    <input type="text" id="search-input" class="form-control" style="width: 260px;" placeholder="Tìm kiếm khách hàng..." onkeyup="filterDatasetTable()">
+                </div>
+                <div class="table-responsive">
+                    <table id="table-dataset">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Tuổi</th>
+                                <th>Giới Tính</th>
+                                <th>Tổng Đơn</th>
+                                <th>AOV Chi Tiêu (VNĐ)</th>
+                                <th>Recency (Ngày)</th>
+                                <th>Hạng Thành Viên</th>
+                                <th>Voucher</th>
+                                <th>Đánh Giá</th>
+                                <th>Nhãn Target (will_return)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dynamic Content -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: ĐÁNH GIÁ 3 MÔ HÌNH ML -->
+        <div id="tab-benchmark" class="tab-pane">
+            <div class="card" style="margin-bottom: 2rem;">
+                <h2 class="section-title">Bảng So Sánh 4 Mô Hình ML — Test Set: 1,126 Khách Hàng (Sau Fine-tune 5 Vòng)</h2>
+                <div class="table-responsive">
+                    <table id="table-models">
+                        <thead>
+                            <tr>
+                                <th>Thuật Toán</th>
+                                <th>Accuracy (%)</th>
+                                <th>Precision</th>
+                                <th>Recall</th>
+                                <th>F1-Score</th>
+                                <th>ROC-AUC Score</th>
+                                <th>Trạng Thái</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dynamic Content -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h2 class="section-title">Feature Importance (<span id="fi-model-label">Gradient Boosting</span>)</h2>
+                    <canvas id="chartFeatureImportance" height="240"></canvas>
+                </div>
+                <div class="card">
+                    <h2 class="section-title">Confusion Matrix — <span id="cm-model-label">Gradient Boosting</span></h2>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                        <div style="background: #F1F5F9; border-radius: 12px; padding: 1.2rem; text-align: center;">
+                            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">True Positives (TP)</div>
+                            <div style="font-size: 1.8rem; font-weight: 800; color: var(--emerald); margin-top: 4px;" id="cm-tp">896</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Dự đoán đúng khách quay lại</div>
+                        </div>
+                        <div style="background: #F1F5F9; border-radius: 12px; padding: 1.2rem; text-align: center;">
+                            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">False Positives (FP)</div>
+                            <div style="font-size: 1.8rem; font-weight: 800; color: var(--crimson); margin-top: 4px;" id="cm-fp">94</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Dự đoán nhầm Churn thành quay lại</div>
+                        </div>
+                        <div style="background: #F1F5F9; border-radius: 12px; padding: 1.2rem; text-align: center;">
+                            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">False Negatives (FN)</div>
+                            <div style="font-size: 1.8rem; font-weight: 800; color: var(--amber); margin-top: 4px;" id="cm-fn">40</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Bỏ sót khách quay lại</div>
+                        </div>
+                        <div style="background: #F1F5F9; border-radius: 12px; padding: 1.2rem; text-align: center;">
+                            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">True Negatives (TN)</div>
+                            <div style="font-size: 1.8rem; font-weight: 800; color: var(--primary); margin-top: 4px;" id="cm-tn">96</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Dự đoán đúng khách Churn</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: DỰ ĐOÁN HÀNG LOẠT (CSV) -->
+        <div id="tab-batch" class="tab-pane">
+            <div class="card">
+                <h2 class="section-title">Dự Đoán Hàng Loạt Khách Hàng Và Xuất Kết Quả CSV</h2>
+                
+                <div style="display: flex; gap: 1.2rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <input type="file" id="batch-file-input" accept=".csv" class="form-control" style="width: 280px;">
+                        <button class="btn-primary" style="width: auto; padding: 0.75rem 1.5rem;" onclick="runBatchPredictWithFile()">Tải File & Dự Đoán</button>
+                    </div>
+                    <span style="color: var(--text-muted); font-size: 0.85rem; font-weight: 700;">hoặc</span>
+                    <button class="btn-primary" style="width: auto; padding: 0.75rem 1.5rem; background: #F1F5F9; color: var(--text-heading); border: 1px solid var(--border-color);" onclick="runBatchPredictSample()">Dự Đoán Dữ Liệu Mẫu (30 Khách Hàng)</button>
+                    <button class="btn-primary" style="width: auto; background: #FFFFFF; color: var(--text-heading); border: 1px solid var(--border-color);" onclick="exportCSVResults()">Tải File CSV Kết Quả</button>
+                </div>
+
+                <div class="table-responsive" style="max-height: 500px;">
+                    <table id="table-batch-results">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Tuổi</th>
+                                <th>Giới Tính</th>
+                                <th>Tổng Đơn</th>
+                                <th>AOV Chi Tiêu (VNĐ)</th>
+                                <th>Recency</th>
+                                <th>Thành Viên</th>
+                                <th>Xác Suất Quay Lại (%)</th>
+                                <th>Kết Quả AI</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dynamic Content -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        let currentGender = 'Nam';
+        let currentMembership = 'Bạc';
+        let currentVoucher = 1;
+        let batchResultsCache = [];
+
+        function switchTab(evt, tabId) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+
+            evt.currentTarget.classList.add('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
+        }
+
+        function setGender(g) {
+            currentGender = g;
+            document.getElementById('g-nam').className = 'pill-btn ' + (g === 'Nam' ? 'active' : '');
+            document.getElementById('g-nu').className = 'pill-btn ' + (g === 'Nữ' ? 'active' : '');
+        }
+
+        function setMembership(m) {
+            currentMembership = m;
+            ['dong', 'bac', 'vang', 'kc'].forEach(k => {
+                document.getElementById('m-' + k).className = 'pill-btn';
+            });
+            const map = {'Đồng': 'dong', 'Bạc': 'bac', 'Vàng': 'vang', 'Kim Cương': 'kc'};
+            document.getElementById('m-' + map[m]).className = 'pill-btn active';
+        }
+
+        function setVoucher(v) {
+            currentVoucher = v;
+            document.getElementById('v-1').className = 'pill-btn ' + (v === 1 ? 'active' : '');
+            document.getElementById('v-0').className = 'pill-btn ' + (v === 0 ? 'active' : '');
+        }
+
+        function updateThresh(v) {
+            document.getElementById('val-thresh').innerText = parseFloat(v).toFixed(2);
+        }
+
+        // Preset Examples Handler
+        function loadPreset(num) {
+            if (num === 1) { // VIP
+                document.getElementById('sim-age').value = 35;
+                document.getElementById('val-age').innerText = 35;
+                setGender('Nữ');
+                document.getElementById('sim-purchases').value = 15;
+                document.getElementById('val-purchases').innerText = 15;
+                document.getElementById('sim-aov').value = 1200000;
+                document.getElementById('val-aov').innerText = "1,200,000";
+                document.getElementById('sim-recency').value = 5;
+                document.getElementById('val-recency').innerText = 5;
+                setMembership('Kim Cương');
+                setVoucher(1);
+                document.getElementById('sim-sat').value = 5;
+                document.getElementById('val-sat').innerText = "5/5 ⭐";
+            } else if (num === 2) { // Churned Customer
+                document.getElementById('sim-age').value = 45;
+                document.getElementById('val-age').innerText = 45;
+                setGender('Nam');
+                document.getElementById('sim-purchases').value = 2;
+                document.getElementById('val-purchases').innerText = 2;
+                document.getElementById('sim-aov').value = 200000;
+                document.getElementById('val-aov').innerText = "200,000";
+                document.getElementById('sim-recency').value = 120;
+                document.getElementById('val-recency').innerText = 120;
+                setMembership('Đồng');
+                setVoucher(0);
+                document.getElementById('sim-sat').value = 2;
+                document.getElementById('val-sat').innerText = "2/5 ⭐";
+            } else if (num === 3) { // Voucher Hunter
+                document.getElementById('sim-age').value = 22;
+                document.getElementById('val-age').innerText = 22;
+                setGender('Nữ');
+                document.getElementById('sim-purchases').value = 8;
+                document.getElementById('val-purchases').innerText = 8;
+                document.getElementById('sim-aov').value = 150000;
+                document.getElementById('val-aov').innerText = "150,000";
+                document.getElementById('sim-recency').value = 25;
+                document.getElementById('val-recency').innerText = 25;
+                setMembership('Bạc');
+                setVoucher(1);
+                document.getElementById('sim-sat').value = 4;
+                document.getElementById('val-sat').innerText = "4/5 ⭐";
+            }
+        }
+
+        // ANIMATED NUMBER COUNTER (Con số % nảy nhảy từ 0% lên targetPct)
+        function animateCounter(elementId, targetPct, duration = 600) {
+            const el = document.getElementById(elementId);
+            const start = 0;
+            const startTime = performance.now();
+
+            function step(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const currentVal = (progress * targetPct).toFixed(1);
+                el.innerText = currentVal + '%';
+
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                }
+            }
+            requestAnimationFrame(step);
+        }
+
+        async function runPredict() {
+            const scanBar = document.getElementById('scanning-bar');
+            scanBar.style.display = 'block';
+
+            const body = {
+                model_name: document.getElementById('sim-model').value,
+                threshold: parseFloat(document.getElementById('sim-threshold').value),
+                age: parseInt(document.getElementById('sim-age').value),
+                gender: currentGender,
+                total_purchases: parseInt(document.getElementById('sim-purchases').value),
+                avg_order_value: parseFloat(document.getElementById('sim-aov').value),
+                days_since_last_purchase: parseInt(document.getElementById('sim-recency').value),
+                membership_level: currentMembership,
+                used_voucher: currentVoucher,
+                satisfaction_score: parseInt(document.getElementById('sim-sat').value)
+            };
+
+            try {
+                const res = await fetch('/api/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const r = await res.json();
+
+                scanBar.style.display = 'none';
+
+                // Ẩn placeholder, hiện kết quả
+                document.getElementById('output-placeholder').style.display = 'none';
+                const outputResults = document.getElementById('output-results');
+                
+                // Triggers Pop-In Animation
+                outputResults.style.display = 'block';
+                outputResults.classList.remove('animate-pop-in');
+                void outputResults.offsetWidth; // force reflow
+                outputResults.classList.add('animate-pop-in');
+
+                // Fill Hero Banner (% SIÊU NỔI BẬT)
+                const isReturn = r.prediction_label === 1;
+                const hero = document.getElementById('hero-banner');
+                hero.className = 'hero-pct-banner ' + (isReturn ? 'return' : 'churn');
+                
+                // Display Percentage Directly Without Counter Animation
+                document.getElementById('hero-num').innerText = r.probability_return_pct + '%';
+
+                document.getElementById('hero-title').innerText = isReturn 
+                    ? 'KHÁCH HÀNG SẼ QUAY LẠI MUA SẮM' 
+                    : 'NGUY CƠ RỜI BỎ CHURN KHÁCH HÀNG';
+
+                document.getElementById('hero-breakdown').innerText = 
+                    `Xác suất quay lại: ${r.probability_return_pct}% | Nguy cơ rời bỏ Churn: ${r.churn_risk_pct}%`;
+
+                // Fill Attribute Pills
+                document.getElementById('out-age').innerText = body.age;
+                document.getElementById('out-gender').innerText = body.gender;
+                document.getElementById('out-purchases').innerText = body.total_purchases + ' lần';
+                document.getElementById('out-aov').innerText = body.avg_order_value.toLocaleString() + ' VNĐ';
+                document.getElementById('out-recency').innerText = body.days_since_last_purchase + ' ngày';
+                document.getElementById('out-membership').innerText = body.membership_level;
+                document.getElementById('out-voucher').innerText = body.used_voucher == 1 ? 'True (Có dùng)' : 'False (Không dùng)';
+                document.getElementById('out-sat').innerText = body.satisfaction_score + '/5';
+
+                // Fill Synthesis Analysis
+                document.getElementById('out-synthesis').innerText = r.synthesis_analysis;
+
+                // Fill Result String & Advice
+                document.getElementById('out-result-string').innerText = r.formatted_result_string;
+                document.getElementById('out-advice').innerText = r.recommended_action;
+
+            } catch (err) {
+                scanBar.style.display = 'none';
+                alert("Lỗi dự đoán: " + err);
+            }
+        }
+
+        async function loadOverviewData() {
+            try {
+                const res = await fetch('/api/stats');
+                const data = await res.json();
+
+                document.getElementById('st-total').innerText = data.total_customers.toLocaleString();
+                document.getElementById('st-return').innerText = data.return_rate + '%';
+                document.getElementById('st-churn').innerText = data.churn_rate + '%';
+                document.getElementById('st-aov').innerText = data.avg_aov.toLocaleString() + ' đ';
+
+                const tbody = document.querySelector('#table-dataset tbody');
+                tbody.innerHTML = data.preview.map((r, idx) => `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td>${r.age}</td>
+                        <td>${r.gender}</td>
+                        <td>${r.total_purchases}</td>
+                        <td>${r.avg_order_value.toLocaleString()} đ</td>
+                        <td>${r.days_since_last_purchase} ngày</td>
+                        <td>${r.membership_level}</td>
+                        <td>${r.used_voucher == 1 ? 'Có' : 'Không'}</td>
+                        <td>${r.satisfaction_score}/5 ⭐</td>
+                        <td>
+                            ${r.will_return == 1 
+                                ? '<span class="tag tag-return">Quay lại</span>' 
+                                : '<span class="tag tag-churn">Churn</span>'}
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                console.error("Lỗi overview:", err);
+            }
+        }
+
+        async function loadBenchmarkData() {
+            try {
+                const res = await fetch('/api/models');
+                const evalData = await res.json();
+
+                const bestModelName = evalData['_best_model'] || 'Gradient Boosting';
+                const modelOrder = ['Gradient Boosting', 'Random Forest', 'Decision Tree', 'Logistic Regression'];
+                const sortedNames = modelOrder.filter(n => evalData[n]);
+
+                const tbody = document.querySelector('#table-models tbody');
+                tbody.innerHTML = sortedNames.map(name => {
+                    const m = evalData[name];
+                    const isBest = name === bestModelName;
+                    return `
+                        <tr style="${isBest ? 'background: var(--primary-light);' : ''}">
+                            <td style="font-weight: 800; color: ${isBest ? 'var(--primary)' : 'var(--text-heading)'};">
+                                ${name} ${isBest ? '★ Champion' : ''}
+                            </td>
+                            <td style="font-weight: 800;">${(m.accuracy * 100).toFixed(2)}%</td>
+                            <td>${m.precision.toFixed(4)}</td>
+                            <td>${m.recall.toFixed(4)}</td>
+                            <td style="font-weight: 800; color: var(--emerald);">${m.f1.toFixed(4)}</td>
+                            <td>${m.roc_auc.toFixed(4)}</td>
+                            <td>
+                                ${isBest
+                                    ? '<span class="tag tag-return">Chính thức</span>'
+                                    : '<span style="color: var(--text-muted);">Baseline</span>'}
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+                // Confusion matrix & feature importance: dùng best model
+                const best = evalData[bestModelName];
+                if (best && best.confusion_matrix) {
+                    document.getElementById('cm-tn').innerText = best.confusion_matrix[0][0];
+                    document.getElementById('cm-fp').innerText = best.confusion_matrix[0][1];
+                    document.getElementById('cm-fn').innerText = best.confusion_matrix[1][0];
+                    document.getElementById('cm-tp').innerText = best.confusion_matrix[1][1];
+                    // Label confusion matrix header
+                    const cmTitle = document.getElementById('cm-model-label');
+                    if (cmTitle) cmTitle.innerText = bestModelName;
+                }
+
+                if (best && best.feature_importances) {
+                    const ctx = document.getElementById('chartFeatureImportance').getContext('2d');
+                    const labels = best.feature_importances.map(i => i[0]).slice(0, 10);
+                    const values = best.feature_importances.map(i => parseFloat(i[1].toFixed(4))).slice(0, 10);
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Feature Importance',
+                                data: values,
+                                backgroundColor: labels.map((_, i) => i < 3 ? '#4338CA' : '#818CF8'),
+                                borderRadius: 6
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: ctx => ' ' + (ctx.raw * 100).toFixed(2) + '%'
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: { grid: { color: '#E2E8F0' }, ticks: { color: '#64748B', callback: v => (v*100).toFixed(1)+'%' } },
+                                y: { grid: { display: false }, ticks: { color: '#0F172A', font: { weight: '600' } } }
+                            }
+                        }
+                    });
+                    // Label feature importance title
+                    const fiTitle = document.getElementById('fi-model-label');
+                    if (fiTitle) fiTitle.innerText = bestModelName;
+                }
+
+                // Update navbar badge dynamically with real best model + accuracy
+                const headerBadge = document.getElementById('header-best-model');
+                if (headerBadge && best) {
+                    headerBadge.innerText = `${bestModelName} ${(best.accuracy * 100).toFixed(2)}% Accuracy`;
+                }
+            } catch (err) {
+                console.error("Lỗi benchmark:", err);
+            }
+        }
+
+        async function runBatchPredictSample() {
+            try {
+                const res = await fetch('/api/predict-batch', { method: 'POST' });
+                batchResultsCache = await res.json();
+                renderBatchTable(batchResultsCache);
+            } catch (err) {
+                alert("Lỗi dự đoán dữ liệu mẫu: " + err);
+            }
+        }
+
+        async function runBatchPredictWithFile() {
+            const fileInput = document.getElementById('batch-file-input');
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert("Vui lòng chọn một file CSV từ máy tính của bạn trước!");
+                return;
+            }
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                const res = await fetch('/api/predict-batch', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.error) {
+                    alert("Lỗi file CSV: " + data.error);
+                    return;
+                }
+                batchResultsCache = data;
+                renderBatchTable(batchResultsCache);
+            } catch (err) {
+                alert("Lỗi khi gửi file CSV: " + err);
+            }
+        }
+
+        function renderBatchTable(data) {
+            if (!Array.isArray(data)) {
+                console.error("Dữ liệu trả về không phải dạng mảng:", data);
+                if (data && data.error) {
+                    alert("Lỗi dữ liệu mẫu: " + data.error);
+                }
+                return;
+            }
+            const tbody = document.querySelector('#table-batch-results tbody');
+            tbody.innerHTML = data.map((row, idx) => `
+                <tr>
+                    <td>${idx + 1}</td>
+                    <td>${row.age != null ? row.age : '-'}</td>
+                    <td>${row.gender != null ? row.gender : '-'}</td>
+                    <td>${row.total_purchases != null ? row.total_purchases : '-'}</td>
+                    <td>${row.avg_order_value ? Number(row.avg_order_value).toLocaleString() : 0} đ</td>
+                    <td>${row.days_since_last_purchase != null ? row.days_since_last_purchase : '-'} ngày</td>
+                    <td>${row.membership_level != null ? row.membership_level : '-'}</td>
+                    <td style="font-weight: 800; color: ${row.du_doan_quay_lai === 1 ? 'var(--emerald)' : 'var(--crimson)'};">
+                        ${row['xac_suat_quay_lai_%'] != null ? row['xac_suat_quay_lai_%'] : 0}%
+                    </td>
+                    <td>
+                        ${row.du_doan_quay_lai === 1 
+                            ? '<span class="tag tag-return">Quay lại</span>' 
+                            : '<span class="tag tag-churn">Churn</span>'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function exportCSVResults() {
+            if (!batchResultsCache.length) {
+                alert("Vui lòng chạy dự đoán hàng loạt trước!");
+                return;
+            }
+            const headers = Object.keys(batchResultsCache[0]).join(',');
+            const rows = batchResultsCache.map(r => Object.values(r).map(v => `"${v}"`).join(','));
+            const csv = [headers, ...rows].join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "ket_qua_du_doan_khach_hang.csv";
+            link.click();
+        }
+
+        function filterDatasetTable() {
+            const input = document.getElementById("search-input").value.toLowerCase();
+            const trs = document.querySelectorAll("#table-dataset tbody tr");
+            trs.forEach(tr => {
+                const text = tr.innerText.toLowerCase();
+                tr.style.display = text.includes(input) ? "" : "none";
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadOverviewData();
+            loadBenchmarkData();
+            runBatchPredictSample();
+        });
+    </script>
+</body>
+</html>

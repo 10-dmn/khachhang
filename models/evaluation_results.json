@@ -1,0 +1,215 @@
+{
+  "Logistic Regression": {
+    "accuracy": 0.6847246891651865,
+    "precision": 0.9394856278366112,
+    "recall": 0.6634615384615384,
+    "f1": 0.7777082028804008,
+    "roc_auc": 0.790615159694107,
+    "confusion_matrix": [
+      [
+        150,
+        40
+      ],
+      [
+        315,
+        621
+      ]
+    ],
+    "best_params": {
+      "C": 0.1,
+      "penalty": "l2",
+      "solver": "lbfgs"
+    }
+  },
+  "Decision Tree": {
+    "accuracy": 0.7495559502664298,
+    "precision": 0.9348404255319149,
+    "recall": 0.7510683760683761,
+    "f1": 0.8329383886255924,
+    "roc_auc": 0.8088900134952766,
+    "confusion_matrix": [
+      [
+        141,
+        49
+      ],
+      [
+        233,
+        703
+      ]
+    ],
+    "best_params": {
+      "min_samples_split": 20,
+      "min_samples_leaf": 5,
+      "max_depth": 10,
+      "criterion": "entropy"
+    }
+  },
+  "Random Forest": {
+    "accuracy": 0.9156305506216696,
+    "precision": 0.936656282450675,
+    "recall": 0.9636752136752137,
+    "f1": 0.9499736703528173,
+    "roc_auc": 0.9575067476383267,
+    "confusion_matrix": [
+      [
+        129,
+        61
+      ],
+      [
+        34,
+        902
+      ]
+    ],
+    "best_params": {
+      "n_estimators": 550,
+      "min_samples_split": 2,
+      "min_samples_leaf": 1,
+      "max_features": 0.3,
+      "max_depth": null,
+      "bootstrap": false
+    },
+    "feature_importances": [
+      [
+        "age",
+        0.2800713661018388
+      ],
+      [
+        "avg_order_value",
+        0.18824544030886795
+      ],
+      [
+        "ltv_score",
+        0.17174437081621644
+      ],
+      [
+        "satisfaction_recency",
+        0.08892119338481175
+      ],
+      [
+        "purchase_intensity",
+        0.06831600157785261
+      ],
+      [
+        "days_since_last_purchase",
+        0.05471351384373325
+      ],
+      [
+        "satisfaction_score",
+        0.04081049584663567
+      ],
+      [
+        "gender_Nữ",
+        0.026935069964206037
+      ],
+      [
+        "total_purchases",
+        0.026863136738773195
+      ],
+      [
+        "membership_level_Đồng",
+        0.02357939341404901
+      ],
+      [
+        "membership_level_Vàng",
+        0.011886878519764868
+      ],
+      [
+        "used_voucher",
+        0.011619677897313866
+      ],
+      [
+        "membership_level_Kim Cương",
+        0.006258613072349266
+      ],
+      [
+        "voucher_low_value",
+        3.484851358725849e-05
+      ]
+    ]
+  },
+  "Gradient Boosting": {
+    "accuracy": 0.9422735346358793,
+    "precision": 0.9569779643231899,
+    "recall": 0.9743589743589743,
+    "f1": 0.9655902593965061,
+    "roc_auc": 0.969523166891588,
+    "confusion_matrix": [
+      [
+        149,
+        41
+      ],
+      [
+        24,
+        912
+      ]
+    ],
+    "best_params": {
+      "subsample": 0.95,
+      "n_estimators": 550,
+      "min_samples_split": 3,
+      "min_samples_leaf": 1,
+      "max_features": null,
+      "max_depth": 14,
+      "learning_rate": 0.0562
+    },
+    "feature_importances": [
+      [
+        "avg_order_value",
+        0.2359263461662737
+      ],
+      [
+        "age",
+        0.2308253545475623
+      ],
+      [
+        "ltv_score",
+        0.20606063091783075
+      ],
+      [
+        "satisfaction_recency",
+        0.09897052214242213
+      ],
+      [
+        "purchase_intensity",
+        0.06572352844095997
+      ],
+      [
+        "days_since_last_purchase",
+        0.037264487673775624
+      ],
+      [
+        "satisfaction_score",
+        0.03577360007730599
+      ],
+      [
+        "gender_Nữ",
+        0.032250680084938955
+      ],
+      [
+        "membership_level_Đồng",
+        0.02024510557383721
+      ],
+      [
+        "used_voucher",
+        0.01463116011489617
+      ],
+      [
+        "membership_level_Vàng",
+        0.011452194265869443
+      ],
+      [
+        "total_purchases",
+        0.009937683199486675
+      ],
+      [
+        "membership_level_Kim Cương",
+        0.0009386072573578469
+      ],
+      [
+        "voucher_low_value",
+        9.953748325123498e-08
+      ]
+    ]
+  },
+  "_best_model": "Gradient Boosting"
+}

@@ -1,0 +1,33 @@
+
+================================================================================
+ KHỞI ĐỘNG BỘ KIỂM THỬ TỰ ĐỘNG TOÀN DIỆN (AUTOMATION TEST SUITE)
+ Dự án: Boomerang Radar AI | Học phần: Kiểm thử Phần mềm
+ Trường ĐH Công nghệ Đông Á - Nhóm 21 (Đào Đức Mạnh - 20230470)
+================================================================================
+  [✓ PASS] test_it_01_feature_engineering_pipeline  | Thời gian:   2.00 ms
+  [✓ PASS] test_it_02_batch_prediction_pipeline     | Thời gian: 115.11 ms
+  [✓ PASS] test_it_03_multi_model_selection         | Thời gian: 348.71 ms
+  [✓ PASS] test_st_01_home_dashboard                | Thời gian:   7.01 ms
+  [✓ PASS] test_st_02_api_stats                     | Thời gian:   9.52 ms
+  [✓ PASS] test_st_03_api_models_evaluation         | Thời gian:   0.00 ms
+  [✓ PASS] test_st_04_api_predict_single_success    | Thời gian:  90.07 ms
+  [✓ PASS] test_st_05_api_predict_boundary_out_of_range | Thời gian:  91.17 ms
+  [✓ PASS] test_st_06_api_predict_batch_success     | Thời gian: 141.42 ms
+  -> Đã tìm thấy bộ dữ liệu tại: data/customer_repurchase_data.csv
+  [✓ PASS] test_ut_01_load_clean_data               | Thời gian:   6.13 ms
+  -> Đã tìm thấy bộ dữ liệu tại: data/customer_repurchase_data.csv
+  [✓ PASS] test_ut_02_feature_ranges_boundary       | Thời gian:   7.00 ms
+  [✓ PASS] test_ut_03_predict_single_high_loyalty   | Thời gian:  93.08 ms
+  [✓ PASS] test_ut_04_predict_single_high_churn     | Thời gian:  98.08 ms
+  [✓ PASS] test_ut_05_threshold_sensitivity         | Thời gian: 180.67 ms
+
+================================================================================
+ HOÀN TẤT BỘ TEST TỰ ĐỘNG! TỔNG THỜI GIAN THỰC THI: 1193.20 ms
+================================================================================
+
+>>> TẤT CẢ CÁC TEST CASES ĐÃ PASS 100%! HỆ THỐNG ĐẠT CHUẨN KIỂM THỬ <<<
+
+----------------------------------------------------------------------
+Ran 14 tests in 1.199s
+
+OK
